@@ -1,9 +1,8 @@
 package server;
 
 import java.io.*;
-import java.net.Socket;
-import java.util.Map;
-import java.util.Random;
+import java.net.*;
+import java.util.*;
 
 public class HandleRequest implements Runnable {
 

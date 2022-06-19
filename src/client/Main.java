@@ -1,8 +1,8 @@
 package client;
 
 import java.io.*;
-import java.net.Socket;
-import java.util.Scanner;
+import java.net.*;
+import java.util.*;
 
 public class Main {
 
