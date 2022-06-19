@@ -63,10 +63,12 @@ public class HandleRequest implements Runnable {
                         }
                     } else if (byIdOrName.equals("BY_ID")) {
                         Integer fileNumber = Integer.valueOf(fileLabel);
+                        // If file exist
                         if (map.containsKey(fileNumber)) {
                             String filename = map.get(fileNumber);
                             File file = new File("./src/server/data/" + filename);
                             try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                                dataOutputStream.writeUTF("200");
                                 int size = (int) file.length();
                                 dataOutputStream.writeInt(size);
                                 byte[] bytes = new byte[(int) size];
@@ -75,6 +77,7 @@ public class HandleRequest implements Runnable {
                             }
                         }
                     }
+
                     break;
                 case "DELETE":
                     break;

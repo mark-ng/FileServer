@@ -97,7 +97,7 @@ public class Main {
     public static void getFile(String byIdOrName, String fileLabel, Scanner scanner) {
         try (Socket socket = new Socket("localhost", 5000);
              DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream())
         ) {
             String requestMsg = "GET" + " " + byIdOrName + " " + fileLabel;
             System.out.println(requestMsg);
@@ -105,18 +105,21 @@ public class Main {
 
             System.out.println("The request was sent.");
 
-            System.out.print("The file was downloaded! Specify a name for it: ");
-            String newFilename = scanner.nextLine();
-            int size = dataInputStream.readInt();
-            byte[] bytes = new byte[size];
-            dataInputStream.readFully(bytes, 0, size);
-            File file = new File("./src/client/data/" + newFilename);
+            String statusCode = dataInputStream.readUTF();
+            if (statusCode.equals("200")) {
+                System.out.print("The file was downloaded! Specify a name for it: ");
+                String newFilename = scanner.nextLine();
+                int size = dataInputStream.readInt();
+                byte[] bytes = new byte[size];
+                dataInputStream.readFully(bytes, 0, size);
+                File file = new File("./src/client/data/" + newFilename);
 
-            try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                outputStream.write(bytes, 0, size);
+                try (FileOutputStream outputStream = new FileOutputStream(file)) {
+                    outputStream.write(bytes, 0, size);
+                }
+
+                System.out.println("File saved on the hard drive!");
             }
-
-            System.out.println("File saved on the hard drive!");
         } catch (IOException e) {
             e.printStackTrace();
         }
