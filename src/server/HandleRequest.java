@@ -41,9 +41,33 @@ public class HandleRequest implements Runnable {
                         randomInt = r.nextInt(10000);
                     }
                     map.put(randomInt, newFilename);
+                    System.out.println(map);
                     dataOutputStream.writeUTF("Response says that file is saved! ID = " + randomInt);
                     break;
                 case "GET":
+                    String byIdOrName = request[1];
+                    String fileLabel = request[2];
+                    if (byIdOrName.equals("BY_NAME")) {
+                        File file = new File("./src/server/data/" + fileLabel);
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        int size = (int) file.length();
+                        dataOutputStream.writeInt(size);
+                        byte[] bytes = new byte[(int) size];
+                        fileInputStream.read(bytes, 0, size);
+                        dataOutputStream.write(bytes, 0, size);
+                    } else if (byIdOrName.equals("BY_ID")) {
+                        Integer fileNumber = Integer.valueOf(fileLabel);
+                        if (map.containsKey(fileNumber)) {
+                            String filename = map.get(fileNumber);
+                            File file = new File("./src/server/data/" + filename);
+                            FileInputStream fileInputStream = new FileInputStream(file);
+                            int size = (int) file.length();
+                            dataOutputStream.writeInt(size);
+                            byte[] bytes = new byte[(int) size];
+                            fileInputStream.read(bytes, 0, size);
+                            dataOutputStream.write(bytes, 0, size);
+                        }
+                    }
                     break;
                 case "DELETE":
                     break;

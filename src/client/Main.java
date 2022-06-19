@@ -18,10 +18,12 @@ public class Main {
                     case "1":
                         System.out.print("Enter name: ");
                         String name = scanner.nextLine();
+                        getFile("BY_NAME", name, scanner);
                         break;
                     case "2":
                         System.out.print("Enter id: ");
                         String id = scanner.nextLine();
+                        getFile("BY_ID", id, scanner);
                         break;
                 }
                 break;
@@ -78,6 +80,35 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void getFile(String byIdOrName, String fileLabel, Scanner scanner) {
+        try (Socket socket = new Socket("localhost", 5000);
+             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+        ) {
+            String requestMsg = "GET" + " " + byIdOrName + " " + fileLabel;
+            System.out.println(requestMsg);
+            dataOutputStream.writeUTF(requestMsg);
+
+            System.out.println("The request was sent.");
+
+            System.out.print("The file was downloaded! Specify a name for it: ");
+            String newFilename = scanner.nextLine();
+            int size = dataInputStream.readInt();
+            byte[] bytes = new byte[size];
+            dataInputStream.readFully(bytes, 0, size);
+            File file = new File("./src/client/data/" + newFilename);
+
+            try (FileOutputStream outputStream = new FileOutputStream(file)) {
+                outputStream.write(bytes, 0, size);
+            }
+
+            System.out.println("File saved on the hard drive!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
