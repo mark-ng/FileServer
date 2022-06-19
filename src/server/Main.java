@@ -13,7 +13,20 @@ public class Main {
             System.out.println("Server started. Listening on port 5000");
             ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-            HashMap<Integer, String> map = new HashMap<>();
+            File file = new File("./src/server/data/" + "map");
+            HashMap<Integer, String> map;
+            if (file.exists()) {
+                try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                    map = (HashMap<Integer, String>) objectInputStream.readObject();
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                map = new HashMap<>();
+            }
+
+            System.out.println(map);
 
             while (true) {
                 Socket socket = serverSocket.accept();
@@ -24,7 +37,6 @@ public class Main {
                     return;
                 }
             }
-
 
         } catch (IOException e) {
             e.printStackTrace();

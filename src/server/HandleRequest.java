@@ -46,7 +46,15 @@ public class HandleRequest implements Callable {
                     while (map.containsKey(randomInt)) {
                         randomInt = r.nextInt(10000);
                     }
+
+
                     map.put(randomInt, newFilename);
+
+                    try (FileOutputStream mapOutputStream = new FileOutputStream("./src/server/data/" + "map")) {
+                        ObjectOutputStream objectOutputStream = new ObjectOutputStream(mapOutputStream);
+                        objectOutputStream.writeObject(map);
+                    }
+
                     System.out.println(map);
 
                     String responseMsg = "200" + " " + randomInt;
