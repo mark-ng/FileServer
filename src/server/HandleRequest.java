@@ -49,23 +49,25 @@ public class HandleRequest implements Runnable {
                     String fileLabel = request[2];
                     if (byIdOrName.equals("BY_NAME")) {
                         File file = new File("./src/server/data/" + fileLabel);
-                        FileInputStream fileInputStream = new FileInputStream(file);
-                        int size = (int) file.length();
-                        dataOutputStream.writeInt(size);
-                        byte[] bytes = new byte[(int) size];
-                        fileInputStream.read(bytes, 0, size);
-                        dataOutputStream.write(bytes, 0, size);
-                    } else if (byIdOrName.equals("BY_ID")) {
-                        Integer fileNumber = Integer.valueOf(fileLabel);
-                        if (map.containsKey(fileNumber)) {
-                            String filename = map.get(fileNumber);
-                            File file = new File("./src/server/data/" + filename);
-                            FileInputStream fileInputStream = new FileInputStream(file);
+                        try (FileInputStream fileInputStream = new FileInputStream(file)) {
                             int size = (int) file.length();
                             dataOutputStream.writeInt(size);
                             byte[] bytes = new byte[(int) size];
                             fileInputStream.read(bytes, 0, size);
                             dataOutputStream.write(bytes, 0, size);
+                        }
+                    } else if (byIdOrName.equals("BY_ID")) {
+                        Integer fileNumber = Integer.valueOf(fileLabel);
+                        if (map.containsKey(fileNumber)) {
+                            String filename = map.get(fileNumber);
+                            File file = new File("./src/server/data/" + filename);
+                            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                                int size = (int) file.length();
+                                dataOutputStream.writeInt(size);
+                                byte[] bytes = new byte[(int) size];
+                                fileInputStream.read(bytes, 0, size);
+                                dataOutputStream.write(bytes, 0, size);
+                            }
                         }
                     }
                     break;
