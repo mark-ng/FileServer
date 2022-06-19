@@ -41,10 +41,12 @@ public class Main {
                     case "1":
                         System.out.print("Enter name: ");
                         String name = scanner.nextLine();
+                        deleteFile("BY_NAME", name);
                         break;
                     case "2":
                         System.out.print("Enter id: ");
                         String id = scanner.nextLine();
+                        deleteFile("BY_ID", id);
                         break;
                 }
                 break;
@@ -124,6 +126,28 @@ public class Main {
             e.printStackTrace();
         }
 
+    }
+
+    public static void deleteFile(String byIdOrName, String fileLabel) {
+        try (Socket socket = new Socket("localhost", 5000);
+             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream())
+        ) {
+            String requestMsg = "DELETE" + " " + byIdOrName + " " + fileLabel;
+            System.out.println(requestMsg);
+            dataOutputStream.writeUTF(requestMsg);
+
+            System.out.println("The request was sent.");
+
+            String statusCode = dataInputStream.readUTF();
+            if (statusCode.equals("200")) {
+                System.out.println("The response says that this file was deleted successfully!");
+            } else if (statusCode.equals("404")) {
+                System.out.println("The response says that this file is not found!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

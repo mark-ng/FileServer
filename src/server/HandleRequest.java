@@ -80,6 +80,41 @@ public class HandleRequest implements Runnable {
 
                     break;
                 case "DELETE":
+                    String deleteByIdOrName = request[1];
+                    String deleteFileLabel = request[2];
+                    if (deleteByIdOrName.equals("BY_NAME")) {
+                        File file = new File("./src/server/data/" + deleteFileLabel);
+                        if (file.exists()) {
+                            boolean deleted = file.delete();
+                            if (deleted) {
+                                dataOutputStream.writeUTF("200");
+                            } else {
+                                dataOutputStream.writeUTF("404");
+                            }
+                        } else {
+                            dataOutputStream.writeUTF("404");
+                        }
+                    } else if (deleteByIdOrName.equals("BY_ID")) {
+                        Integer fileInt = Integer.valueOf(deleteFileLabel);
+                        if (map.containsKey(fileInt)) {
+                            String filename = map.get(fileInt);
+                            System.out.println("Delete: " + filename);
+                            File file = new File("./src/server/data/" + filename);
+                            if (file.exists()) {
+                                boolean deleted = file.delete();
+                                if (deleted) {
+                                    dataOutputStream.writeUTF("200");
+                                } else {
+                                    System.out.println("cannot delete");
+                                    dataOutputStream.writeUTF("404");
+                                }
+                            } else {
+                                dataOutputStream.writeUTF("404");
+                            }
+                        } else {
+                            dataOutputStream.writeUTF("404");
+                        }
+                    }
                     break;
             }
         } catch (IOException e) {
