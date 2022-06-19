@@ -1,24 +1,25 @@
 package server;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.util.Map;
+import java.util.Random;
 
 public class HandleRequest implements Runnable {
 
     private final Socket socket;
+    private final Map<Integer, String> map;
 
-    public HandleRequest(Socket socket) {
+    public HandleRequest(Socket socket, Map<Integer, String> map) {
         this.socket = socket;
+        this.map = map;
     }
 
     @Override
     public void run() {
-        DataInputStream dataInputStream;
         try {
-            dataInputStream = new DataInputStream(socket.getInputStream());
+            DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
             String requestMessage = dataInputStream.readUTF();
             System.out.println(requestMessage);
             String[] request = requestMessage.split(" ");
@@ -33,6 +34,15 @@ public class HandleRequest implements Runnable {
                         dataInputStream.readFully(bytes, 0, size);
                         fileOutputStream.write(bytes, 0, size);
                     }
+
+                    // Generate integer identifier
+                    Random r = new Random();
+                    int randomInt = r.nextInt(10000);
+                    while (map.containsKey(randomInt)) {
+                        randomInt = r.nextInt(10000);
+                    }
+                    map.put(randomInt, newFilename);
+                    dataOutputStream.writeUTF("Response says that file is saved! ID = " + randomInt);
                     break;
                 case "GET":
                     break;

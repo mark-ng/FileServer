@@ -54,6 +54,7 @@ public class Main {
     public static void saveFile(String filename, String newFilename) {
         try (Socket socket = new Socket("localhost", 5000)) {
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
             dataOutputStream.writeUTF("PUT" + " " + newFilename);
 
             // Send File To Server
@@ -68,6 +69,12 @@ public class Main {
                 // Write from buffer to socket
                 dataOutputStream.write(bytes, 0, length);
             }
+
+            System.out.println("The request was sent.");
+
+            String serverMsg = dataInputStream.readUTF();
+            System.out.println(serverMsg);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
