@@ -17,12 +17,19 @@ public class Main {
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                executorService.execute(new HandleRequest(socket, map));
+                Future<Integer> submit = executorService.submit(new HandleRequest(socket, map));
+                Integer o = submit.get();
+                if (o == -1) {
+                    executorService.shutdown();
+                    return;
+                }
             }
 
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
     }

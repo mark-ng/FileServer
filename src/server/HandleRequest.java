@@ -3,8 +3,9 @@ package server;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.Callable;
 
-public class HandleRequest implements Runnable {
+public class HandleRequest implements Callable {
 
     private final Socket socket;
     private final Map<Integer, String> map;
@@ -15,7 +16,7 @@ public class HandleRequest implements Runnable {
     }
 
     @Override
-    public void run() {
+    public Integer call() {
         try {
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -25,6 +26,8 @@ public class HandleRequest implements Runnable {
             String requestMethod = request[0];
 
             switch (requestMethod) {
+                case "exit":
+                    return -1;
                 case "PUT":
                     String newFilename = request[1];
                     try (FileOutputStream fileOutputStream = new FileOutputStream("./src/server/data/" + newFilename)) {
@@ -54,7 +57,12 @@ public class HandleRequest implements Runnable {
                     String fileLabel = request[2];
                     if (byIdOrName.equals("BY_NAME")) {
                         File file = new File("./src/server/data/" + fileLabel);
+                        if (!file.exists()) {
+                            dataOutputStream.writeUTF("404");
+                            break;
+                        }
                         try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                            dataOutputStream.writeUTF("200");
                             int size = (int) file.length();
                             dataOutputStream.writeInt(size);
                             byte[] bytes = new byte[(int) size];
@@ -75,6 +83,8 @@ public class HandleRequest implements Runnable {
                                 fileInputStream.read(bytes, 0, size);
                                 dataOutputStream.write(bytes, 0, size);
                             }
+                        } else {
+                            dataOutputStream.writeUTF("404");
                         }
                     }
 
@@ -126,5 +136,7 @@ public class HandleRequest implements Runnable {
                 e.printStackTrace();
             }
         }
+
+        return 0;
     }
 }

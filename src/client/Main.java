@@ -51,9 +51,21 @@ public class Main {
                 }
                 break;
             case "exit":
+                exitProgram();
                 break;
         }
     }
+
+    public static void exitProgram() {
+        try (Socket socket = new Socket("localhost", 5000)) {
+            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            dataOutputStream.writeUTF("exit");
+            System.out.println("The request was sent.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void saveFile(String filename, String newFilename) {
         File file = new File("./src/client/data/" + filename);
@@ -121,6 +133,8 @@ public class Main {
                 }
 
                 System.out.println("File saved on the hard drive!");
+            } else {
+                System.out.println("The response says that this file is not found!");
             }
         } catch (IOException e) {
             e.printStackTrace();
