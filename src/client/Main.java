@@ -54,13 +54,18 @@ public class Main {
     }
 
     public static void saveFile(String filename, String newFilename) {
+        File file = new File("./src/client/data/" + filename);
+        if (!file.exists()) {
+            System.out.println("Fail to save file!");
+            return;
+        }
+
         try (Socket socket = new Socket("localhost", 5000)) {
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
             dataOutputStream.writeUTF("PUT" + " " + newFilename);
 
             // Send File To Server
-            File file = new File("./src/client/data/" + filename);
             try (FileInputStream fileInputStream = new FileInputStream(file)) {
                 // Send the length of the file
                 dataOutputStream.writeInt((int) file.length());
@@ -75,7 +80,14 @@ public class Main {
             System.out.println("The request was sent.");
 
             String serverMsg = dataInputStream.readUTF();
-            System.out.println(serverMsg);
+            String[] serverResponse = serverMsg.split(" ");
+            String statusCode = serverResponse[0];
+            if (statusCode.equals("200")) {
+                String fileLabel = serverResponse[1];
+                System.out.println("Response says that file is saved! ID = " + fileLabel);
+            } else if (statusCode.equals("403")) {
+                System.out.println("Fail to save file!");
+            }
 
         } catch (IOException e) {
             e.printStackTrace();

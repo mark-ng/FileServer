@@ -32,6 +32,9 @@ public class HandleRequest implements Runnable {
                         byte[] bytes = new byte[size];
                         dataInputStream.readFully(bytes, 0, size);
                         fileOutputStream.write(bytes, 0, size);
+                    } catch (IOException e) {
+                        String responseMsg = "403";
+                        dataOutputStream.writeUTF(responseMsg);
                     }
 
                     // Generate integer identifier
@@ -42,7 +45,9 @@ public class HandleRequest implements Runnable {
                     }
                     map.put(randomInt, newFilename);
                     System.out.println(map);
-                    dataOutputStream.writeUTF("Response says that file is saved! ID = " + randomInt);
+
+                    String responseMsg = "200" + " " + randomInt;
+                    dataOutputStream.writeUTF(responseMsg);
                     break;
                 case "GET":
                     String byIdOrName = request[1];
